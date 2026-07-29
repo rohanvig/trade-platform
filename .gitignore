@@ -1,0 +1,39 @@
+# ---------- Python ----------
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+venv/
+.venv/
+env/
+
+.pytest_cache/
+.mypy_cache/
+
+# ---------- Environment ----------
+.env
+
+# ---------- VS Code ----------
+.vscode/
+
+# ---------- macOS ----------
+.DS_Store
+
+# ---------- Next.js ----------
+frontend/node_modules/
+frontend/.next/
+
+# ---------- Logs ----------
+*.log
+
+# ---------- Coverage ----------
+coverage/
+htmlcov/
+
+# ---------- Build ----------
+dist/
+build/
+
+# ---------- Docker ----------
+*.pid
