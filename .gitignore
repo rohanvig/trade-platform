@@ -37,3 +37,6 @@ build/
 
 # ---------- Docker ----------
 *.pid
+
+# ---------- Backend environment variables ----------
+backend/.env
