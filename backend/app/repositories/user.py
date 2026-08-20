@@ -25,3 +25,8 @@ class UserRepository:
         self.db.refresh(user)
 
         return user
+
+    def get_by_id(self, user_id: int) -> User | None:
+        statement = select(User).where(User.id == user_id)
+
+        return self.db.scalar(statement)
