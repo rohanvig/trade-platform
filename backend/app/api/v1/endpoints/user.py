@@ -12,6 +12,7 @@ from app.models.user import User
 from fastapi.security import OAuth2PasswordRequestForm
 
 
+
 router = APIRouter(
     prefix="/users",
     tags=["Users"],
@@ -43,15 +44,15 @@ def create_user(
     response_model=TokenResponse,
 )
 def login(
-    data: OAuth2PasswordRequestForm = Depends(),
+    form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db),
 ):
     service = UserService(db)
 
     try:
         token = service.login(
-            email=data.username,
-            password=data.password,
+            email=form_data.username,
+            password=form_data.password,
         )
 
         return {
@@ -63,6 +64,7 @@ def login(
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=str(error),
+            headers={"WWW-Authenticate": "Bearer"},
         )
 
 @router.get(

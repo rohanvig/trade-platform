@@ -9,6 +9,7 @@ from app.db.base import Base
 # Import models here so Alembic can detect them.
 # We'll add actual models later.
 from app.models.user import User
+from app.models.order import Order
 
 config = context.config
 
