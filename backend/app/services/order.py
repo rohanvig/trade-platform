@@ -63,9 +63,37 @@ class OrderService:
 
         return order
 
+    def cancel_order(
+        self,
+        order_id: int,
+        user_id: int,
+    ) -> Order:
+        order = self.repository.get_by_id(order_id)
+
+        if order is None or order.user_id != user_id:
+            raise KeyError("Order not found")
+
+        if order.status not in (OrderStatus.PENDING, OrderStatus.OPEN):
+            raise ValueError(
+                f"Cannot cancel order with status '{order.status.value}'"
+            )
+
+        order.status = OrderStatus.CANCELLED
+        return self.repository.update(order)
+
     def get_user_orders(
         self,
         user_id: int,
+        status: OrderStatus | None = None,
+        symbol: str | None = None,
+        limit: int = 50,
+        offset: int = 0,
     ) -> list[Order]:
 
-        return self.repository.get_by_user(user_id)
+        return self.repository.get_by_user(
+            user_id=user_id,
+            status=status,
+            symbol=symbol,
+            limit=limit,
+            offset=offset,
+        )
