@@ -1,9 +1,14 @@
-from datetime import datetime
+from datetime import datetime, timezone
+from decimal import Decimal
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from app.models.user import User
 from enum import Enum
 
 from sqlalchemy import DateTime, Enum as SQLEnum
 from sqlalchemy import ForeignKey, Integer, Numeric, String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
 
@@ -41,6 +46,11 @@ class Order(Base):
         index=True,
     )
 
+    user: Mapped["User"] = relationship(
+        "User",
+        back_populates="orders",
+    )
+
     symbol: Mapped[str] = mapped_column(
         String(50),
         nullable=False,
@@ -62,7 +72,7 @@ class Order(Base):
         nullable=False,
     )
 
-    price: Mapped[float | None] = mapped_column(
+    price: Mapped[Decimal | None] = mapped_column(
         Numeric(15, 2),
         nullable=True,
     )
@@ -81,13 +91,13 @@ class Order(Base):
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime,
-        default=datetime.utcnow,
+        default=lambda: datetime.now(timezone.utc),
         nullable=False,
     )
 
     updated_at: Mapped[datetime] = mapped_column(
         DateTime,
-        default=datetime.utcnow,
-        onupdate=datetime.utcnow,
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
         nullable=False,
     )

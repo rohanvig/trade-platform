@@ -288,7 +288,12 @@ Current Milestone:
 
 > Architectural design and backend setup of the project.
 
+  how to run this project:
+    .\venv\Scripts\activate        // where you have kept this project run this command there as of now "cd backend"
 
+     uvicorn app.main:app --reload  // after the above command then this one 
+     
+    
 
  📄 License
 
