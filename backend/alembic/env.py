@@ -10,6 +10,7 @@ from app.db.base import Base
 # We'll add actual models later.
 from app.models.user import User
 from app.models.order import Order
+from app.models.portfolio import Portfolio, Position
 
 config = context.config
 

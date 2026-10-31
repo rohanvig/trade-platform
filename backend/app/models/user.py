@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from app.models.order import Order
+    from app.models.portfolio import Portfolio, Position
 
 from sqlalchemy import DateTime, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -44,6 +45,19 @@ class User(Base):
 
     orders: Mapped[list["Order"]] = relationship(
         "Order",
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
+
+    portfolio: Mapped["Portfolio"] = relationship(
+        "Portfolio",
+        back_populates="user",
+        uselist=False,
+        cascade="all, delete-orphan",
+    )
+
+    positions: Mapped[list["Position"]] = relationship(
+        "Position",
         back_populates="user",
         cascade="all, delete-orphan",
     )

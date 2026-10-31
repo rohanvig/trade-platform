@@ -22,6 +22,7 @@ router = APIRouter(
 )
 def create_order(
     order_data: OrderCreate,
+    execute: bool = Query(default=False, description="Automatically execute paper order immediately"),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
@@ -31,6 +32,7 @@ def create_order(
         return service.create_order(
             user_id=current_user.id,
             order_data=order_data,
+            execute_immediately=execute,
         )
 
     except ValueError as exc:
@@ -101,6 +103,35 @@ def cancel_order(
 
     try:
         return service.cancel_order(
+            order_id=order_id,
+            user_id=current_user.id,
+        )
+    except KeyError:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Order not found",
+        )
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        )
+
+
+@router.post(
+    "/{order_id}/execute",
+    response_model=OrderResponse,
+    summary="Simulate instant execution of a pending paper order against live market price",
+)
+def execute_order(
+    order_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    service = OrderService(db)
+
+    try:
+        return service.execute_order(
             order_id=order_id,
             user_id=current_user.id,
         )

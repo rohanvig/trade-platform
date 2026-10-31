@@ -8,12 +8,14 @@ from app.schemas.order import OrderCreate
 class OrderService:
 
     def __init__(self, db: Session):
+        self.db = db
         self.repository = OrderRepository(db)
 
     def create_order(
         self,
         user_id: int,
         order_data: OrderCreate,
+        execute_immediately: bool = False,
     ) -> Order:
 
         # LIMIT orders require a price
@@ -44,7 +46,33 @@ class OrderService:
             status=OrderStatus.PENDING,
         )
 
-        return self.repository.create(order)
+        order = self.repository.create(order)
+
+        if execute_immediately:
+            from app.services.portfolio import PortfolioService
+            portfolio_service = PortfolioService(self.db)
+            return portfolio_service.execute_paper_order(order)
+
+        return order
+
+    def execute_order(
+        self,
+        order_id: int,
+        user_id: int,
+    ) -> Order:
+        order = self.repository.get_by_id(order_id)
+
+        if order is None or order.user_id != user_id:
+            raise KeyError("Order not found")
+
+        if order.status not in (OrderStatus.PENDING, OrderStatus.OPEN):
+            raise ValueError(
+                f"Cannot execute order with status '{order.status.value}'"
+            )
+
+        from app.services.portfolio import PortfolioService
+        portfolio_service = PortfolioService(self.db)
+        return portfolio_service.execute_paper_order(order)
 
     def get_order(
         self,

@@ -13,7 +13,7 @@ This document outlines the phased development plan for the TradePilot platform, 
 | **Phase 3** | Technical Indicators (From Scratch) | 🟢 Complete (100%) | SMA, EMA, RSI, MACD, Bollinger Bands, ATR, VWAP |
 | **Phase 4** | Strategy Engine | 🟢 Complete (100%) | BaseStrategy, Registry, SMA Crossover, RSI Reversion, MACD |
 | **Phase 5** | Backtesting Engine | 🟢 Complete (100%) | Historical Simulator, Equity Curve, Drawdown, Sharpe, Sortino |
-| **Phase 6** | Paper Trading | 🟡 Up Next | Virtual Portfolio, Simulated Execution Engine, Trade History |
+| **Phase 6** | Paper Trading | 🟢 Complete (100%) | Virtual Portfolio, Live Quote Execution, Position Tracking |
 | **Phase 7** | Broker Integration | ⚪ Planned | Live Broker API Adapter, Webhooks, Order Routing |
 | **Phase 8** | AI-Assisted Trading Research | ⚪ Planned | Market News Summarizer, LLM Agent Analysts, Journal Copilot |
 | **Phase 9** | Web Dashboard (Frontend) | ⚪ Planned | Next.js App, TradingView Lightweight Charts, Order Book |
@@ -77,6 +77,16 @@ This document outlines the phased development plan for the TradePilot platform, 
 - [x] Timestamped Equity Curve timeseries output for charting
 - [x] Backtesting API endpoint (`POST /api/v1/backtest/run`)
 - [x] Automated test suite for Backtesting Engine (5 tests)
+
+### Phase 6 — Paper Trading & Virtual Portfolio
+- [x] SQLAlchemy models for `Portfolio` ($100k virtual cash) and `Position`
+- [x] PortfolioRepository managing cash, positions, and average buy price updates
+- [x] PortfolioService calculating live unrealized PnL and total portfolio value
+- [x] Simulated order execution against live market quotes (`POST /orders/{id}/execute`)
+- [x] Immediate paper execution support on order creation (`POST /orders?execute=true`)
+- [x] Insufficient funds and insufficient shares validation
+- [x] Portfolio endpoints (`GET /api/v1/portfolio`, `GET /api/v1/portfolio/positions`)
+- [x] Automated test suite for Paper Trading (5 tests)
 
 ---
 
