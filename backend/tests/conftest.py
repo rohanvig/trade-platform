@@ -1,4 +1,5 @@
 import pytest
+from unittest.mock import patch
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -11,6 +12,7 @@ from app.main import app
 from app.models.user import User
 from app.models.order import Order
 from app.models.portfolio import Portfolio, Position
+from tests.mock_data import MockMarketController, MockSearch, MockTicker
 
 # In-memory SQLite for fast, isolated tests
 TEST_DATABASE_URL = "sqlite:///:memory:"
@@ -39,7 +41,27 @@ def db_session():
 
 
 @pytest.fixture(scope="function")
-def client(db_session):
+def mock_market():
+    controller = MockMarketController()
+
+    def ticker_factory(sym):
+        controller.ticker_calls.append(sym)
+        return MockTicker(sym, controller)
+
+    def search_factory(query, max_results=8, *args, **kwargs):
+        controller.search_calls.append(
+            {"query": query, "max_results": max_results, "args": args, "kwargs": kwargs}
+        )
+        return MockSearch(query, max_results=max_results, controller=controller)
+
+    with patch("yfinance.Ticker", side_effect=ticker_factory), \
+         patch("yfinance.Search", side_effect=search_factory):
+        yield controller
+        controller.reset()
+
+
+@pytest.fixture(scope="function")
+def client(db_session, mock_market):
     def override_get_db():
         try:
             yield db_session
