@@ -54,3 +54,4 @@ class MarketDataAdapter(Protocol):
         and freshness flags, treating illiquid bids/asks/marks as nullable.
         """
         ...
+

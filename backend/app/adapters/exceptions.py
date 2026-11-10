@@ -26,3 +26,4 @@ class UnsupportedAssetError(DeribitAdapterError):
     """Raised when an unsupported underlying asset is requested (only BTC and ETH supported)."""
 
     pass
+

@@ -12,9 +12,9 @@
 
 | Task ID | Batch | Summary | Traceability (FR / NFR) | Expected Files | Acceptance Criteria | Status |
 | :--- | :---: | :--- | :--- | :--- | :--- | :---: |
-| **TSK-030** | Batch 1 | Define Pydantic domain schemas with string-based `Decimal` parsing, nullable quotes, `is_index`, and `is_closed` flags | FR-001, FR-003, FR-008, FR-010, FR-014, NFR-001 | `backend/app/schemas/crypto_market.py` | AC-001, AC-005, AC-006, AC-007 | Pending Approval |
-| **TSK-031** | Batch 1 | Define async `MarketDataAdapter` protocol and Deribit domain exceptions | FR-001, FR-013, NFR-002, NFR-005 | `backend/app/adapters/base.py`, `backend/app/adapters/exceptions.py` | AC-008, AC-009 | Pending Approval |
-| **TSK-032** | Batch 1 | Implement `DeribitMarketDataAdapter` with `httpx.AsyncClient`, rate limiting, bounded exponential backoff, and metadata join | FR-002, FR-004, FR-006, FR-007, FR-009, FR-013, NFR-003 | `backend/app/adapters/deribit.py` | AC-001, AC-004, AC-005, AC-008 | Pending Approval |
+| **TSK-030** | Batch 1 | Define Pydantic domain schemas with string-based `Decimal` parsing, nullable quotes, `is_index`, and `is_closed` flags | FR-001, FR-003, FR-008, FR-010, FR-014, NFR-001 | `backend/app/schemas/crypto_market.py` | AC-001, AC-005, AC-006, AC-007 | Complete |
+| **TSK-031** | Batch 1 | Define async `MarketDataAdapter` protocol and Deribit domain exceptions | FR-001, FR-013, NFR-002, NFR-005 | `backend/app/adapters/base.py`, `backend/app/adapters/exceptions.py` | AC-008, AC-009 | Complete |
+| **TSK-032** | Batch 1 | Implement `DeribitMarketDataAdapter` with `httpx.AsyncClient`, rate limiting, bounded exponential backoff, and metadata join | FR-002, FR-004, FR-006, FR-007, FR-009, FR-013, NFR-003 | `backend/app/adapters/deribit.py` | AC-001, AC-004, AC-005, AC-008 | Complete |
 | **TSK-033** | Batch 2 | Implement `CryptoMarketDataService` with tiered TTL caching, stampede lock, 4H UTC candle aggregator, and coin-to-USD conversion | FR-004, FR-005, FR-009, FR-011, FR-012, NFR-003 | `backend/app/services/crypto_market.py` | AC-002, AC-003 | Pending Approval |
 | **TSK-034** | Batch 2 | Implement FastAPI endpoints under `/api/v1/crypto/...`, application lifespan management, and mount to API router | FR-002, FR-003, FR-004, FR-006, NFR-005 | `backend/app/api/v1/endpoints/crypto_market.py`, `backend/app/api/router.py`, `backend/app/main.py` | AC-001..AC-006 | Pending Approval |
 | **TSK-035** | Batch 2 | Build offline synthetic fixtures (`deribit_samples.py`) and test suite verifying all 10 acceptance criteria | NFR-004, AC-001..AC-010 | `backend/tests/fixtures/deribit_samples.py`, `backend/tests/test_crypto_market.py` | AC-001..AC-010 | Pending Approval |
@@ -24,20 +24,20 @@
 ## 2. Cohesive Implementation Batches
 
 ### Batch 1: Domain Schemas, Protocol & Deribit Async Adapter
-- [ ] **TSK-030**: Create `backend/app/schemas/crypto_market.py`:
+- [x] **TSK-030**: Create `backend/app/schemas/crypto_market.py`:
   - `CryptoQuote`: `underlying`, `index_name`, `index_price` (`Decimal`), `is_index=True`, `timestamp`.
   - `CryptoCandle`: `instrument_name`, `timeframe`, `timestamp`, `open`, `high`, `low`, `close`, `volume`, `is_closed`.
   - `OptionContractSummary`: `instrument_name`, `strike`, `option_type`, `expiry_date`, `expiration_timestamp`, `contract_size`, `settlement_currency`, `quote_currency`, nullable `mark_price_raw`, `mark_price_usd`, `mark_iv`, `bid_price_raw`, `ask_price_raw`, `bid_price_usd`, `ask_price_usd`, `open_interest`, `is_oi_delayed=True`.
   - `OptionChainResponse`: `underlying`, `expiry_date`, `underlying_index_price`, `calls`, `puts`, `total_contracts`.
   - Use custom field validators ensuring string-based `Decimal` conversion without float artifacts.
-- [ ] **TSK-031**: Create `backend/app/adapters/base.py` and `backend/app/adapters/exceptions.py`:
+- [x] **TSK-031**: Create `backend/app/adapters/base.py` and `backend/app/adapters/exceptions.py`:
   - Define `MarketDataAdapter(Protocol)` with async signatures:
     - `async def get_index_price(underlying: str) -> CryptoQuote`
     - `async def get_instrument_candles(instrument_name: str, resolution: str, start_ts: int, end_ts: int) -> list[CryptoCandle]`
     - `async def get_active_instruments(currency: str) -> list[dict]`
     - `async def get_book_summary(currency: str) -> list[dict]`
   - Define domain exceptions: `DeribitRateLimitError`, `DeribitTimeoutError`, `DeribitDataError`, `UnsupportedAssetError`.
-- [ ] **TSK-032**: Create `backend/app/adapters/deribit.py`:
+- [x] **TSK-032**: Create `backend/app/adapters/deribit.py`:
   - Implement `DeribitMarketDataAdapter` accepting an `httpx.AsyncClient`.
   - Connects to `https://www.deribit.com/api/v2/public/`.
   - Enforce timeouts: 5s connect, 10s read.
