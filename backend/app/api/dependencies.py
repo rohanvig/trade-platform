@@ -1,4 +1,5 @@
-from fastapi import Depends, HTTPException, status
+from typing import Any
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordBearer
 from jwt import InvalidTokenError
 import jwt
@@ -52,3 +53,17 @@ def get_current_user(
         raise credentials_exception
 
     return user
+
+
+def get_crypto_service(request: Request) -> Any:
+    """Dependency provider for CryptoMarketDataService."""
+    from app.adapters.deribit import DeribitMarketDataAdapter
+    from app.services.crypto_market import CryptoMarketDataService
+
+    service = getattr(request.app.state, "crypto_service", None)
+    if service is None:
+        client = getattr(request.app.state, "http_client", None)
+        adapter = DeribitMarketDataAdapter(client=client)
+        service = CryptoMarketDataService(adapter=adapter)
+        request.app.state.crypto_service = service
+    return service
